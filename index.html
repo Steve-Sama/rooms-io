@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Open Graph (WhatsApp / Facebook / Telegram preview) -->
+<meta property="og:title" content="ROOMS.IO — Anonymous Chat Rooms" />
+<meta property="og:description" content="Join real-time anonymous chat rooms instantly. No signup required." />
+<meta property="og:image" content="preview.png" />
+<meta property="og:url" content="https://yourdomain.com" />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0f172a" />
+
+
+  <title>ROOMS.IO</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: white;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 20px;
+      color: #38bdf8;
+    }
+
+    .menu {
+      position: relative;
+    }
+
+    .hamburger {
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* ✅ UPDATED DROPDOWN (HAMBURGER ONLY) */
+    .dropdown {
+      position: absolute;
+      right: 0;
+      top: 40px;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      flex-direction: column;
+      overflow: hidden;
+
+      /* instead of display none */
+      display: flex;
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+
+      transition: all 0.25s ease;
+      min-width: 170px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+      border: 1px solid #334155;
+    }
+
+    /* SHOW STATE */
+    .dropdown.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown a {
+      padding: 12px 18px;
+      text-decoration: none;
+      color: white;
+      border-bottom: 1px solid #334155;
+      font-size: 14px;
+      transition: background 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .dropdown a:hover {
+      background: #334155;
+      padding-left: 24px;
+    }
+
+    /* EVERYTHING BELOW REMAINS UNTOUCHED */
+    .hero-text {
+      padding: 40px 20px 20px;
+      font-size: 26px;
+      line-height: 1.4;
+      font-weight: bold;
+    }
+
+    .sub-text {
+      padding: 0 20px 20px;
+      color: #94a3b8;
+    }
+
+    .images {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+    }
+
+    .cta {
+      display: flex;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    .btn {
+      background: #38bdf8;
+      color: #0f172a;
+      padding: 15px 25px;
+      border-radius: 30px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    @media (min-width: 768px) {
+      .hero-text {
+        font-size: 36px;
+        text-align: center;
+      }
+
+      .sub-text {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">ROOMS.IO</div>
+  <div class="menu">
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="dropdown" id="dropdown">
+      <a href="#">Login / Sign Up</a>
+      <a href="#">About Us</a>
+    </div>
+  </div>
+
+  <div id="toast" style="
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(31, 44, 52, 0.9);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 9999;">
+  </div>
+</header>
+
+<div class="hero-text">
+  Say what you can't say out loud.
+</div>
+
+<div class="sub-text">
+  Create a room. Share the link. Let the anonymous chaos begin.
+</div>
+
+<div class="images">
+  <img class="circle" src="https://picsum.photos/200?random=1" alt="img1" />
+  <img class="circle" src="https://picsum.photos/200?random=2" alt="img2" />
+  <img class="circle" src="https://picsum.photos/200?random=3" alt="img3" />
+</div>
+
+<div class="cta">
+  <button class="btn" onclick="createRoom()">Create a Room</button>
+</div>
+
+<section style="padding: 40px 20px;">
+  <div style="max-width: 500px; margin: auto;">
+    <h2 style="font-size: 22px; margin-bottom: 10px; text-align: center;">
+      Built for Real Conversations
+    </h2>
+
+    <p style="color: #94a3b8; text-align: center; margin-bottom: 30px; line-height: 1.6;">
+      ROOMS.IO removes identity barriers so people can speak freely, connect instantly, and engage without limits.
+    </p>
+
+    <div style="display: grid; gap: 15px;">
+
+      <div style="background:#1e293b;padding:18px;border-radius:16px;border:1px solid #334155;">
+        <div style="font-weight:600;margin-bottom:5px;">Instant Room Creation</div>
+        <div style="color:#94a3b8;font-size:14px;">Launch a private chat space in seconds and share it anywhere.</div>
+      </div>
+
+      <div style="background:#1e293b;padding:18px;border-radius:16px;border:1px solid #334155;">
+        <div style="font-weight:600;margin-bottom:5px;">Anonymous by Design</div>
+        <div style="color:#94a3b8;font-size:14px;">No accounts. No tracking. Just open and honest interaction.</div>
+      </div>
+
+      <div style="background:#1e293b;padding:18px;border-radius:16px;border:1px solid #334155;">
+        <div style="font-weight:600;margin-bottom:5px;">Real-Time Interaction</div>
+        <div style="color:#94a3b8;font-size:14px;">Messages appear instantly, keeping conversations fast and engaging.</div>
+      </div>
+
+      <div style="background:#1e293b;padding:18px;border-radius:16px;border:1px solid #334155;">
+        <div style="font-weight:600;margin-bottom:5px;">Share Anywhere</div>
+        <div style="color:#94a3b8;font-size:14px;">Post your room link across platforms and watch people join instantly.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 ROOMS.IO — Anonymous. Unfiltered. Real.
+</footer>
+
+<script>
+  /* ✅ ONLY CHANGED HAMBURGER LOGIC */
+  function toggleMenu() {
+    document.getElementById("dropdown").classList.toggle("show");
+  }
+
+  function createRoom() {
+  const roomId = Math.random().toString(36).substring(2, 8);
+
+  const roomLink = `room.html?room=${roomId}`;
+
+  navigator.clipboard.writeText(roomLink).catch(() => {});
+
+  showToast("Room created & link copied 🔗");
+
+  // wait a bit so toast is visible before redirect
+  setTimeout(() => {
+    window.location.href = roomLink;
+  }, 600);
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+
+  toast.style.opacity = "1";
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 2000);
+}
+</script>
+
+</body>
+</html>

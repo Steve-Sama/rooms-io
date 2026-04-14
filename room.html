@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ROOM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Open Graph (WhatsApp / Facebook / Telegram preview) -->
+<meta property="og:title" content="ROOMS.IO — Anonymous Chat Rooms" />
+<meta property="og:description" content="Join real-time anonymous chat rooms instantly. No signup required." />
+<meta property="og:image" content="preview.png" />
+<meta property="og:url" content="https://yourdomain.com" />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0f172a" />
+
+  <style>
+    body {
+  margin: 0;
+  font-family: Arial;
+  background: #0b141a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* HEADER (WhatsApp style) */
+header {
+  padding: 12px;
+  background: #1f2c34;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid #2a3942;
+}
+
+/* CHAT AREA */
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  background-image: url("background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  position: relative;
+}
+
+/* MESSAGE BUBBLES */
+.msg {
+  max-width: 75%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+
+  /* NEW ANIMATION */
+  animation: fadeIn 0.25s ease-out;
+  transform-origin: bottom;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+#chat {
+  scroll-behavior: smooth;
+}
+
+/* USERNAME */
+.name {
+  font-size: 11px;
+  color: #25d366;
+  margin-bottom: 4px;
+}
+
+/* INPUT AREA (sticky like WhatsApp) */
+.input-box {
+  display: flex;
+  padding: 10px;
+  background: #1f2c34;
+  border-top: 1px solid #2a3942;
+  position: sticky;
+  bottom: 0;
+}
+
+/* INPUT FIELD */
+input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  background: #2a3942;
+  color: white;
+}
+
+/* SEND BUTTON */
+button {
+  margin-left: 10px;
+  padding: 10px 16px;
+  border: none;
+  background: #25d366;
+  color: black;
+  font-weight: bold;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+#emojiPanel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+
+  position: absolute;
+  bottom: 70px;
+  left: 10px;
+  right: 10px;
+
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 12px;
+
+  gap: 10px;
+
+  white-space: nowrap;
+  z-index: 9999;
+
+  scrollbar-width: none; /* Firefox */
+}
+
+/* hide scrollbar (Chrome/Safari) */
+#emojiPanel::-webkit-scrollbar {
+  display: none;
+}
+
+#emojiPanel span {
+  font-size: 22px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+  </style>
+</head>
+
+<body>
+
+<header style="padding: 15px; background: #1e293b; text-align: center; font-weight: bold; position: relative;">
+  <div id="roomTitle">ROOM</div>
+
+  <div style="margin-top:8px; font-size:12px; color:#94a3b8;">
+    <span onclick="copyLink()" style="cursor:pointer; color:#38bdf8;">
+      🔗 Copy Room Link
+    </span>
+  </div>
+
+  <!-- LEAVE BUTTON (ONLY ADDITION) -->
+  <button onclick="leaveRoom()" style="
+  position: absolute;
+  right: 12px;
+  top: 10px;
+
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+
+  border: none;
+  padding: 7px 14px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+
+  transition: all 0.2s ease;
+">
+  Leave
+</button>
+
+  <div id="toast" style="
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(31, 44, 52, 0.9);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 9999;
+">
+  </div>
+</header>
+
+<div id="chat"></div>
+
+<div id="typing" style="
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 0 15px 5px;
+  height: 18px;"></div>
+
+<div class="input-box">
+
+  <!-- EMOJI BUTTON -->
+  <button onclick="toggleEmoji()" style="
+    background: transparent;
+    color: white;
+    font-size: 20px;
+    border: none;
+    margin-right: 8px;
+    cursor: pointer;
+  ">😊</button>
+
+  <input id="msgInput" placeholder="Type message..." />
+
+  <button onclick="sendMsg()">Send</button>
+</div>
+
+<!-- EMOJI PANEL -->
+<div id="emojiPanel" style="
+  display: none;
+  position: absolute;
+  bottom: 70px;
+  left: 10px;
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 10px;
+  width: 180px;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 9999;
+">
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+// 🔥 STEP 2: GET ROOM ID
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get("room");
+showToast("👤 Joined room anonymously");
+
+// 🚨 VALIDATE ROOM IMMEDIATELY (FIX 1)
+if (!roomId) {
+  alert("Invalid room link");
+  window.location.href = "index.html";
+}
+
+// set room title only if room exists
+document.getElementById("roomTitle").innerText = "ROOM: " + roomId;
+
+
+// 🔗 COPY LINK FUNCTION (CLEAN)
+function copyLink() {
+  const link = window.location.href;
+
+  navigator.clipboard.writeText(link)
+    .then(() => alert("Room link copied 🔗"))
+    .catch(() => prompt("Copy this link:", link));
+}
+
+
+//SHOW FUNTION FOR NOTIFICATION//
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+
+  // show
+  toast.style.opacity = "1";
+
+  // fade out after 2 seconds
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 2000);
+}
+
+
+  // 🔥 STEP 1: PUT YOUR FIREBASE CONFIG HERE
+  const firebaseConfig = {
+  apiKey: "AIzaSyBDmyJ-DKqq8KbpNwH4r84DZIX-YzoUxx0",
+  authDomain: "rooms-io-502f7.firebaseapp.com",
+  databaseURL: "https://rooms-io-502f7-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "rooms-io-502f7",
+  storageBucket: "rooms-io-502f7.firebasestorage.app",
+  messagingSenderId: "953864047910",
+  appId: "1:953864047910:web:ffa6e0a2b5678609c545e7"
+};
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const typingRef = db.ref("rooms/" + roomId + "/typing");
+
+  
+  // 🔥 STEP 3: RANDOM USERNAME
+  function randomName() {
+    const names = ["Silent", "Dark", "Ghost", "Crazy", "Night", "Lone"];
+    const animals = ["Wolf", "Tiger", "Eagle", "Fox", "Lion"];
+
+    return names[Math.floor(Math.random()*names.length)] + " " +
+           animals[Math.floor(Math.random()*animals.length)] + " " +
+           Math.floor(Math.random()*999);
+  }
+
+  const username = randomName();
+  let typingTimeout;
+
+  // 🔥 STEP 4: SEND MESSAGE
+  function sendMsg() {
+  const input = document.getElementById("msgInput");
+  const text = input.value;
+
+  if (!text) return;
+
+  db.ref("rooms/" + roomId + "/messages").push({
+    text,
+    username,
+    time: Date.now()
+  });
+
+  input.value = "";
+}
+
+  document.getElementById("msgInput").addEventListener("input", () => {
+  typingRef.child(username).set(true);
+
+  clearTimeout(typingTimeout);
+
+  typingTimeout = setTimeout(() => {
+    typingRef.child(username).remove();
+  }, 1500);
+});
+
+
+//EMOJI LIST//
+const emojis = [
+  // 😄 Faces
+  "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇",
+  "🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚",
+  "😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🥸",
+];
+
+const panel = document.getElementById("emojiPanel");
+
+emojis.forEach(e => {
+  const span = document.createElement("span");
+  span.innerText = e;
+  span.style.fontSize = "22px";
+  span.style.cursor = "pointer";
+  span.style.margin = "5px";
+
+  span.onclick = () => {
+    document.getElementById("msgInput").value += e;
+  };
+
+  panel.appendChild(span);
+});
+
+function toggleEmoji() {
+  const panel = document.getElementById("emojiPanel");
+
+  if (panel.style.display === "flex") {
+    panel.style.display = "none";
+  } else {
+    panel.style.display = "flex";
+  }
+}
+
+
+  // 🔥 STEP 5: LISTEN FOR MESSAGES (REAL TIME)
+  db.ref("rooms/" + roomId + "/messages").on("child_added", (snapshot) => {
+    const msg = snapshot.val();
+
+    const div = document.createElement("div");
+    div.classList.add("msg");
+
+if (msg.username === username) {
+  div.style.alignSelf = "flex-end";
+  div.style.background = "#005c4b";
+  div.style.color = "white";
+} else {
+  div.style.alignSelf = "flex-start";
+  div.style.background = "#1f2c34";
+  div.style.color = "white";
+}
+
+    const date = new Date(msg.time);
+const time = date.toLocaleTimeString([], {
+  hour: '2-digit',
+  minute: '2-digit'
+});
+
+div.innerHTML = `
+  <div class="name">${msg.username}</div>
+  <div>${msg.text}</div>
+  <div style="font-size:10px; opacity:0.6; margin-top:4px;">
+    ${time}
+  </div>
+`;
+
+    document.getElementById("chat").appendChild(div);
+
+    // auto scroll
+    document.getElementById("chat").scrollTop =
+      document.getElementById("chat").scrollHeight;
+  });
+
+  typingRef.on("value", (snapshot) => {
+  const data = snapshot.val() || {};
+  const users = Object.keys(data);
+
+  const typingDiv = document.getElementById("typing");
+
+  if (users.length === 0) {
+    typingDiv.innerText = "";
+  } 
+  else if (users.length === 1) {
+    typingDiv.innerText = `${users[0]} is typing...`;
+  } 
+  else {
+    typingDiv.innerText = `Several people are typing...`;
+  }
+});
+
+//LEAVE BUTTON//
+function leaveRoom() {
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
